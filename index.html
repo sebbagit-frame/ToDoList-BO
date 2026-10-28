@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mis Pendientes</title>
+
+  <!-- Tipografías de Google Fonts (si no cargan, se usan las del sistema) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="wrap">
+
+    <header>
+      <div class="today" id="today"></div>
+      <h1>Mis pendientes</h1>
+      <p class="summary" id="summary"></p>
+    </header>
+
+    <!-- NUEVO: selector de sección -->
+    <nav class="tabs views" role="tablist" aria-label="Secciones">
+      <button class="vista-tab" role="tab" data-vista="tareas" aria-selected="true">Pendientes<span class="n" id="n-vista-tareas">0</span></button>
+      <button class="vista-tab" role="tab" data-vista="rutina" aria-selected="false" title="Rutinas que faltan hacer hoy">Rutina semanal<span class="n" id="n-vista-rutina">0</span></button>
+    </nav>
+
+    <!-- Sección 1: pendientes -->
+    <section id="vista-tareas" class="vista">
+
+    <!-- Formulario para agregar tareas -->
+    <form class="add" id="add-form" autocomplete="off">
+      <input class="title-input" id="new-title" type="text" maxlength="200"
+             placeholder="¿Qué tenés que hacer?" aria-label="Nueva tarea" required>
+
+      <div class="fields">
+        <div class="field">
+          <label for="new-cat">Categoría</label>
+          <select id="new-cat">
+            <option>General</option>
+            <option>Excel</option>
+            <option>Reportes</option>
+            <option>Conciliaciones</option>
+            <option>Mails</option>
+            <option>Reuniones</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="new-prio">Prioridad</label>
+          <select id="new-prio">
+            <option value="alta">Alta</option>
+            <option value="media" selected>Media</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="new-due">Fecha límite</label>
+          <input id="new-due" type="date">
+        </div>
+
+        <button class="btn-add" type="submit">Agregar</button>
+      </div>
+    </form>
+
+    <!-- Filtros -->
+    <div class="bar">
+      <div class="tabs" role="tablist" aria-label="Filtrar tareas">
+        <button class="tab" role="tab" data-filter="pending" aria-selected="true">Pendientes<span class="n" id="n-pending">0</span></button>
+        <button class="tab" role="tab" data-filter="done" aria-selected="false">Hechas<span class="n" id="n-done">0</span></button>
+        <button class="tab" role="tab" data-filter="all" aria-selected="false">Todas<span class="n" id="n-all">0</span></button>
+      </div>
+    </div>
+
+    <!-- La lista se dibuja desde app.js -->
+    <div id="list-area"></div>
+
+    </section>
+
+    <!-- NUEVO - Sección 2: rutina semanal -->
+    <section id="vista-rutina" class="vista" hidden>
+
+      <div class="bar">
+        <div class="tabs days" role="tablist" aria-label="Día de la semana" id="dias-tabs"></div>
+      </div>
+      <p class="nota-dia" id="dia-nota"></p>
+
+      <!-- La lista se dibuja desde app.js -->
+      <div id="rutina-lista"></div>
+
+      <form class="add" id="rutina-form" autocomplete="off">
+        <h2 class="form-title">Nueva rutina</h2>
+        <input class="title-input" id="r-title" type="text" maxlength="200"
+               placeholder="Ej: Reporte diario" aria-label="Nombre de la rutina" required>
+
+        <div class="field">
+          <span class="field-label" id="r-days-label">Días</span>
+          <div class="days-pick" role="group" aria-labelledby="r-days-label">
+            <label class="day"><input type="checkbox" name="r-day" value="1" checked><span>Lun</span></label>
+            <label class="day"><input type="checkbox" name="r-day" value="2" checked><span>Mar</span></label>
+            <label class="day"><input type="checkbox" name="r-day" value="3" checked><span>Mié</span></label>
+            <label class="day"><input type="checkbox" name="r-day" value="4" checked><span>Jue</span></label>
+            <label class="day"><input type="checkbox" name="r-day" value="5" checked><span>Vie</span></label>
+            <label class="day"><input type="checkbox" name="r-day" value="6"><span>Sáb</span></label>
+            <label class="day"><input type="checkbox" name="r-day" value="0"><span>Dom</span></label>
+          </div>
+          <div class="presets">
+            <button class="btn-small" type="button" data-preset="lv">Lun a Vie</button>
+            <button class="btn-small" type="button" data-preset="todos">Todos</button>
+            <button class="btn-small" type="button" data-preset="ninguno">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="fields">
+          <div class="field">
+            <label for="r-slot">Momento del día</label>
+            <select id="r-slot">
+              <option value="primera">Primera hora</option>
+              <option value="manana">Mañana</option>
+              <option value="mediodia">Mediodía</option>
+              <option value="tarde">Tarde</option>
+              <option value="cierre">Cierre del día</option>
+              <option value="cualquiera">En cualquier momento</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="r-file">Archivos que usa (solo el nombre)</label>
+            <div class="file-add">
+              <input id="r-file" type="text" maxlength="120" placeholder="Ej: Ventas_diarias.xlsx">
+              <button class="btn-small" type="button" id="r-file-add">Agregar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chips" id="r-files"></div>
+
+        <button class="btn-add" type="submit">Guardar rutina</button>
+      </form>
+
+    </section>
+
+    <p class="notice" id="notice" role="status" aria-live="polite"></p>
+
+    <footer>
+      <p class="status">Las tareas se guardan en este navegador.</p>
+      <button class="clear" id="clear-done" type="button" hidden>Borrar hechas</button>
+    </footer>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
